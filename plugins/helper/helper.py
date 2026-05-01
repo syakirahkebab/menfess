@@ -46,8 +46,8 @@ class Helper():
             return True
 
     async def pesan_langganan(self):
-        link_1 = await self.bot.export_chat_invite_link(config.channel_1)
-        link_2 = await self.bot.export_chat_invite_link(config.channel_2)
+        link_1 = await self._safe_invite_link(config.channel_1)
+        link_2 = await self._safe_invite_link(config.channel_2)
         mention = self.message.from_user.mention
         markup = InlineKeyboardMarkup([
             [InlineKeyboardButton('ɢʀᴏᴜᴘ ʙᴀsᴇ', url=link_2), InlineKeyboardButton('ᴄʜᴀɴɴᴇʟ ʙᴀsᴇ', url=link_1)],
@@ -61,6 +61,18 @@ class Helper():
 <b>Silakan Join Ke Channel & Group dulu⤵️</b>
         """
         await self.bot.send_message(self.user_id, _msg, reply_to_message_id=self.message.id, reply_markup=markup)
+
+    async def _safe_invite_link(self, chat_id: int) -> str:
+        try:
+            return await self.bot.export_chat_invite_link(chat_id)
+        except Exception:
+            try:
+                chat = await self.bot.get_chat(chat_id)
+                if chat.username:
+                    return f"https://t.me/{chat.username}"
+            except Exception:
+                pass
+            return "https://t.me"
 
     async def daftar_pelanggan(self):
         database = Database(self.user_id)
