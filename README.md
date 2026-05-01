@@ -1,66 +1,101 @@
+# BOT MENFESS (Python 3.11)
 
+Bot menfess Telegram berbasis **Pyrogram** dengan MongoDB.
+Konfigurasi sekarang terpusat di file **`.env`** agar stabil saat deploy ke VPS.
 
-# BOT MENFESS
+## 1) Persiapan VPS (Ubuntu)
 
-<div align="center">
-<img alt="Python" src="https://img.shields.io/badge/python-%2314354C.svg?&style=for-the-badge&logo=python&logoColor=white"/>
-<img alt="PyCharm" src="https://img.shields.io/badge/PyCharm-000000.svg?&style=for-the-badge&logo=PyCharm&logoColor=white"/>
-<img alt="Git" src="https://img.shields.io/badge/git-%23F05033.svg?&style=for-the-badge&logo=git&logoColor=white"/>
-</div>
-<div align="center">
-<img alt="Heroku" src="https://img.shields.io/badge/Heroku-purple?&style=for-the-badge&logoColor=white&logo=heroku"/>
-<img alt="Telegram" src="https://img.shields.io/badge/Telegram-blue?&style=for-the-badge&logoColor=white&logo=telegram"/>
-</div>
-━━━━━━━━━━━━━━━━━━━━
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y python3.11 python3.11-venv python3-pip git
+```
 
- 
-### Installation
+## 2) Clone project
 
-<details>
-<summary><b>🔗 Deploy di VPS</b></summary>
-<br>
+```bash
+git clone https://github.com/nekolocal/nekomenfess menfess
+cd menfess
+```
 
-### REQUIREMENTS PACKAGE !
--  Update & upgrade VPS anda `sudo apt update && upgrade -y`
--  Install Git `sudo apt install git -y`
--  Install Python3 `sudo apt install python3`
--  Install PIP / PIP3 `sudo apt install python3-pip`
--  Install NodeJs 16.X `curl -fsSL https://deb.nodesource.com/setup_16.x | sudo bash -` then do `sudo apt install -y nodejs vim`
--  Install FFMPEG `sudo apt install tree wget2 p7zip-full jq ffmpeg wget git -y`
--  Install Chrome `wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb` lalu ketik `sudo apt install ./google-chrome-stable_current_amd64.deb
+## 3) Buat virtual environment
 
-### Eksekusi
-Pertama Salin Kode Dibawah dan Tempel di Vps Kalian.. Tunggu Hingga Proses Selesai
-````bash
-git clone https://github.com/nekolocal/nekomenfess && cd nekomenfess
-````
-Jika Sudah Selesai,Salin Kode Dibawah dan Tempel di Vps
-
-````bash
+```bash
+python3.11 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
 pip install -r requirements.txt
-````
+```
 
-Lalu
+## 4) Konfigurasi `.env`
 
-````bash
-screen -S nekomenfess
+```bash
+cp .env.example .env
+nano .env
+```
 
-````
+Wajib diisi dengan benar:
+- `API_ID`, `API_HASH`, `BOT_TOKEN`
+- `DB_URL`, `DB_NAME`
+- `CHANNEL_1`, `CHANNEL_2`, `CHANNEL_LOG`
+- `ID_ADMIN`
 
-Langkah Terakhir Kalian Ketik Kode Dibawah/Copy Lalu Paste di Vps Kalian dan Enter
-````bash
-python3 main.py
-````
+Catatan penting:
+- Semua `CHANNEL_*` harus ID channel/supergroup valid (format `-100...`).
+- Bot wajib sudah masuk channel dan memiliki izin admin yang diperlukan.
+- Jadwal reset harian bisa diatur lewat:
+  - `RESET_TIMEZONE` (contoh: `Asia/Jakarta`)
+  - `RESET_HOUR`, `RESET_MINUTE`
 
-</details>
+## 5) Jalankan bot
 
-#### START_MESSAGE | FORCE_SUB_MESSAGE
+```bash
+python3.11 main.py
+```
 
-* `{first_name}` - User first name
-* `{last_name}` - User last name
-* `{id}` - User ID
-* `{mention}` - Mention the user
-* `{username}` - Username
-* `{fullname}` - fullname
+## 6) Jalankan dengan systemd (direkomendasikan)
 
+Buat service:
+
+```bash
+sudo nano /etc/systemd/system/menfess.service
+```
+
+Isi contoh:
+
+```ini
+[Unit]
+Description=Menfess Telegram Bot
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/path/to/menfess
+EnvironmentFile=/path/to/menfess/.env
+ExecStart=/path/to/menfess/.venv/bin/python main.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Aktifkan:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now menfess
+sudo systemctl status menfess
+```
+
+## Troubleshooting singkat
+
+- **Database sering tidak terbaca**
+  - Pastikan `DB_URL` valid dan whitelist IP VPS di MongoDB Atlas.
+  - Pastikan DNS VPS normal (`nslookup cluster...mongodb.net`).
+- **Channel tidak terbaca**
+  - Cek ID channel benar.
+  - Cek bot sudah admin di channel/channel log.
+- **Bot tidak start**
+  - Jalankan manual dulu `python3.11 main.py` untuk lihat error awal.
 

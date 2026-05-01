@@ -3,10 +3,18 @@ import pymongo
 import config
 import json
 
-myclient = pymongo.MongoClient(config.db_url)
+myclient = pymongo.MongoClient(
+    config.db_url,
+    serverSelectionTimeoutMS=10000,
+    connectTimeoutMS=10000,
+    socketTimeoutMS=10000,
+    retryWrites=True,
+    retryReads=True,
+    tz_aware=True,
+)
 mydb = myclient[config.db_name]
-
 mycol = mydb['user']
+mycol.create_index("status")
 
 
 class Database():
