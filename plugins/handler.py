@@ -1,7 +1,7 @@
 import re
 
 from pyrogram import Client, filters, enums
-from pyrogram.types import Message, CallbackQuery
+from pyrogram.types import Message, CallbackQuery, ChatMemberUpdated
 
 from plugins import Database, Helper
 from plugins.command import *
@@ -222,3 +222,40 @@ async def on_callback_query(client: Client, query: CallbackQuery):
         await broadcast_ya(client, query)
     elif query.data == 'tutup':
         await close_cbb(client, query)
+
+
+@Bot.on_my_chat_member()
+async def on_bot_chat_member_update(client: Client, update: ChatMemberUpdated):
+    old_status = update.old_chat_member.status
+    new_status = update.new_chat_member.status
+    admin_status = ['administrator', 'owner']
+
+    if old_status == new_status:
+        return
+
+    chat_title = update.chat.title or str(update.chat.id)
+    chat_id = update.chat.id
+    promoted_by = 'Sistem'
+    if update.from_user:
+        promoted_by = update.from_user.mention
+
+    if old_status not in admin_status and new_status in admin_status:
+        await client.send_message(
+            config.id_admin,
+            (
+                f'✅ Bot kembali menjadi admin di <b>{chat_title}</b> '
+                f'(<code>{chat_id}</code>)\n'
+                f'└ Diangkat oleh: {promoted_by}'
+            ),
+            enums.ParseMode.HTML,
+        )
+    elif old_status in admin_status and new_status not in admin_status:
+        await client.send_message(
+            config.id_admin,
+            (
+                f'⚠️ Bot tidak lagi menjadi admin di <b>{chat_title}</b> '
+                f'(<code>{chat_id}</code>)\n'
+                f'└ Diturunkan oleh: {promoted_by}'
+            ),
+            enums.ParseMode.HTML,
+        )
