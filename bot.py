@@ -1,5 +1,4 @@
 import os
-import sys
 
 import requests
 from pyrogram import Client
@@ -40,15 +39,7 @@ class Bot(Client):
             (config.channel_2, 'channel 2'),
             (config.channel_log, 'channel log'),
         ]:
-            try:
-                await self.get_chat(channel_id)
-                await self.get_chat_member(channel_id, bot_me.id)
-            except Exception as exc:
-                print(f'Harap periksa kembali ID [ {channel_id} ] pada {channel_name}')
-                print('Pastikan bot telah dimasukan kedalam channel dan menjadi admin')
-                print(f'Detail error: {type(exc).__name__}: {exc}')
-                print('-> Bot terpaksa dihentikan')
-                sys.exit(1)
+            await self._validate_chat_access(channel_id, channel_name, bot_me.id)
 
         self.username = bot_me.username
         self.id_bot = bot_me.id
@@ -63,6 +54,21 @@ class Bot(Client):
         )
 
         print('BOT TELAH AKTIF')
+
+    async def _validate_chat_access(self, channel_id: int, channel_name: str, bot_id: int):
+        try:
+            await self.get_chat(channel_id)
+            bot_member = await self.get_chat_member(channel_id, bot_id)
+            if bot_member.status not in ['administrator', 'owner']:
+                print(f'⚠️  [PERINGATAN] Bot belum admin pada {channel_name} ({channel_id}).')
+                print('    Fitur yang butuh izin admin bisa gagal, tetapi bot tetap berjalan.')
+            else:
+                print(f'✅ Akses {channel_name} ({channel_id}) terbaca, bot sudah admin.')
+        except Exception as exc:
+            print(f'⚠️  [PERINGATAN] Gagal membaca {channel_name} ({channel_id}).')
+            print('    Pastikan ID benar, bot sudah masuk, dan sudah menjadi admin.')
+            print(f'    Detail error: {type(exc).__name__}: {exc}')
+            print('    Bot tetap dijalankan tanpa menghentikan proses startup.')
 
     async def stop(self):
         await super().stop()
