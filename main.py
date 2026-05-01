@@ -1,4 +1,7 @@
+import asyncio
+
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from pyrogram import idle
 
 import config
 from bot import Bot, Database, data
@@ -22,6 +25,19 @@ scheduler.add_job(
     max_instances=1,
     coalesce=True,
 )
-scheduler.start()
 
-Bot().run()
+
+async def main() -> None:
+    bot = Bot()
+    scheduler.start()
+    try:
+        await bot.start()
+        await idle()
+    finally:
+        scheduler.shutdown(wait=False)
+        if bot.is_connected:
+            await bot.stop()
+
+
+if __name__ == '__main__':
+    asyncio.run(main())
