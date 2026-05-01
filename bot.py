@@ -19,6 +19,7 @@ class Bot(Client):
             api_hash=config.api_hash,
             plugins={"root": "plugins"},
             bot_token=config.bot_token,
+            in_memory=True,
         )
 
     async def start(self):
@@ -41,9 +42,11 @@ class Bot(Client):
         ]:
             try:
                 await self.get_chat(channel_id)
-            except Exception:
+                await self.get_chat_member(channel_id, bot_me.id)
+            except Exception as exc:
                 print(f'Harap periksa kembali ID [ {channel_id} ] pada {channel_name}')
                 print('Pastikan bot telah dimasukan kedalam channel dan menjadi admin')
+                print(f'Detail error: {type(exc).__name__}: {exc}')
                 print('-> Bot terpaksa dihentikan')
                 sys.exit(1)
 
