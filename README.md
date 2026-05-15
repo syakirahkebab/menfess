@@ -36,12 +36,13 @@ nano .env
 Wajib diisi dengan benar:
 - `API_ID`, `API_HASH`, `BOT_TOKEN`
 - `DB_URL`, `DB_NAME`
-- `CHANNEL_1`, `CHANNEL_2`, `CHANNEL_LOG`
+- `CHANNEL_1`, `CHANNEL_2`, `CHANNEL_LOG`, `CHANNEL_DATABASE`
 - `ID_ADMIN`
 
 Catatan penting:
 - Semua `CHANNEL_*` harus ID channel/supergroup valid (format `-100...`).
 - Bot wajib sudah masuk channel dan memiliki izin admin yang diperlukan.
+- `CHANNEL_DATABASE` dipakai untuk log detail pengirim setiap menfess yang sukses dikirim ke channel utama.
 - Jadwal reset harian bisa diatur lewat:
   - `RESET_TIMEZONE` (contoh: `Asia/Jakarta`)
   - `RESET_HOUR`, `RESET_MINUTE`

@@ -61,7 +61,8 @@ async def status_handler(client: Client, msg: types.Message):
     pesan += f'├<b>User ID :</b> <code>{db.id}</code>\n'
     pesan += f'└<b>Status :</b> {db.status}\n\n'
     pesan += '<b>❏ User Stats:</b>\n'
-    pesan += f'├<b>Saldo :</b> {helper.formatrupiah(db.coin)} Coin\n'
+    saldo_display = '∞' if db.status == 'owner' else helper.formatrupiah(db.coin)
+    pesan += f'├<b>Saldo :</b> {saldo_display} Coin\n'
     pesan += f'├<b>Menfess Harian :</b> {db.menfess}/{config.batas_kirim}\n'
     pesan += f'├<b>Semua Menfess :</b> {db.all_menfess}\n'
     pesan += f'└<b>Bergabung :</b> {db.sign_up}\n\n'

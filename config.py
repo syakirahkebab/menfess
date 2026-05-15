@@ -32,6 +32,7 @@ class Settings:
     channel_1: int
     channel_2: int
     channel_log: int
+    channel_database: int
     id_admin: int
     batas_kirim: int
     biaya_kirim: int
@@ -53,6 +54,7 @@ settings = Settings(
     channel_1=_get_int("CHANNEL_1", required=True),
     channel_2=_get_int("CHANNEL_2", required=True),
     channel_log=_get_int("CHANNEL_LOG", required=True),
+    channel_database=_get_int("CHANNEL_DATABASE", _get_int("CHANNEL_LOG", required=True)),
     id_admin=_get_int("ID_ADMIN", required=True),
     batas_kirim=_get_int("BATAS_KIRIM", 5),
     biaya_kirim=_get_int("BIAYA_KIRIM", 25),
@@ -90,6 +92,7 @@ db_name = settings.db_name
 channel_1 = settings.channel_1
 channel_2 = settings.channel_2
 channel_log = settings.channel_log
+channel_database = settings.channel_database
 id_admin = settings.id_admin
 batas_kirim = settings.batas_kirim
 biaya_kirim = settings.biaya_kirim
