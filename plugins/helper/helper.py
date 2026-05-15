@@ -83,7 +83,7 @@ class Helper():
         coin = f"0_{str(self.user_id)}"
         if self.user_id == config.id_admin:
             status = 'owner'
-            coin = f"999999999999999_{str(self.user_id)}"
+            coin = f"{2**63 - 1}_{str(self.user_id)}"
 
         nama = await self.escapeHTML(nama)
         data = {
@@ -117,7 +117,8 @@ class Helper():
             pesan += f"└ Telegram Premium -: {'✅' if self.premium else '❌'}"
         else:
             pesan = "Jangan Lupa main bot @chatjomblohalu_bot"
-        await self.bot.send_message(config.channel_log, pesan, enums.ParseMode.HTML, disable_web_page_preview=True)
+        target_channel = config.channel_database if type == 'log_channel' else config.channel_log
+        await self.bot.send_message(target_channel, pesan, enums.ParseMode.HTML, disable_web_page_preview=True)
 
     def formatrupiah(self, uang):
         y = str(uang)
